@@ -10,8 +10,12 @@ execute in minecraft:the_nether run worldborder set 50
 execute in minecraft:the_end run worldborder center 0 0
 execute in minecraft:the_end run worldborder set 250
 
-# Start the custom World Age at day 0 and store the current position within the day.
-scoreboard players set #world_age bc_world_age 0
-execute store result score #last_day_repetition bc_daytime run time query minecraft:day repetition
+# Initialize World Age from total Game Time (24,000 ticks per Minecraft day).
+scoreboard players set #ticks_per_day bc_daytime 24000
+execute store result score #current_game_time bc_daytime run time query gametime
+scoreboard players operation #current_game_day bc_daytime = #current_game_time bc_daytime
+scoreboard players operation #current_game_day bc_daytime /= #ticks_per_day bc_daytime
+scoreboard players operation #world_age bc_world_age = #current_game_day bc_daytime
+scoreboard players operation #last_game_day bc_daytime = #current_game_day bc_daytime
 
-tellraw @a [{"text":"BendemenMC ","color":"white","bold":true},{"text":"| ","color":"dark_gray","bold":false},{"text":"Overworld/Nether starten op 50 blokken; de End op 250. World Age en bordergroei tellen alleen wanneer minstens 1 speler online is. Slapen telt ook mee.","color":"gold","bold":false}]
+tellraw @a [{"text":"BendemenMC ","color":"white","bold":true},{"text":"| ","color":"dark_gray","bold":false},{"text":"World Age en bordergroei zijn gesynchroniseerd met Game Time. De dag-/nachtcyclus loopt altijd door, ook zonder spelers.","color":"gold","bold":false}]
