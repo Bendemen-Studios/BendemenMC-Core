@@ -32,7 +32,7 @@ rewards:
     material: 'YELLOW_STAINED_GLASS_PANE'
 
 gui:
-  title: '&f&lBendemenMC &8| &6Daily Reward'
+  title: '&f&lBendemenMC &r&8| &6Daily Reward'
   claim-name: '&6&lCLAIM DAILY REWARD'
   claim-lore:
     - '&6Klik om de dagelijkse reward te openen.'
@@ -41,4 +41,4 @@ gui:
   rolling-name: '&6&lDe randomizer draait...'
 
 days-gui:
-  title: '&f&lBendemenMC &8| &6Days Leaderboard'
+  title: '&f&lBendemenMC &r&8| &6Days Leaderboard'
