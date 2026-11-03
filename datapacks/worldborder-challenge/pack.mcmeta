@@ -1,0 +1,7 @@
+{
+  "pack": {
+    "pack_format": 101,
+    "supported_formats": [101, 101],
+    "description": "BendemenMC Worldborder Challenge 26.3 - online Minecraft days; AFK handled by plugin"
+  }
+}
