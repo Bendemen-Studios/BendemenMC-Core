@@ -47,3 +47,8 @@ gradle clean build
 Output: `build/libs/BendemenMC-Core-1.0.0.jar`.
 
 Configuration is stored in `plugins/BendemenMCCore/config.yml`; global cooldown data is stored in `plugins/BendemenMCCore/data.yml`.
+
+
+## Continuous build
+
+GitHub Actions builds the plugin on pushes to `feature/core-plugin` using Java 25. The compiled JAR is published as the `BendemenMC-Core` workflow artifact.
