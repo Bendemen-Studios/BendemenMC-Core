@@ -153,16 +153,14 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         )));
 
         World overworld = Bukkit.getWorld(getConfig().getString("worlds.overworld", "world"));
-        long worldAgeTicks = getOnlineWorldAgeTicks();
-        String worldAgeDisplay = worldAgeTicks < 0L
+        long worldAgeDays = getOnlineWorldAgeDays();
+        String worldAgeDisplay = worldAgeDays < 0L
                 ? "&cDatapack niet geladen"
-                : "&e" + (worldAgeTicks / MINECRAFT_DAY_TICKS) + " Minecraft-dagen";
-        String worldAgeTime = worldAgeTicks < 0L ? "&7Onbekend" : "&f" + formatLongPlaytime(worldAgeTicks);
+                : "&e" + worldAgeDays + " Minecraft-dagen";
         inv.setItem(49, item(Material.CLOCK, "&6&lWORLD AGE", List.of(
                 "&7Wereld: &f" + (overworld == null ? "Niet gevonden" : overworld.getName()),
                 "&7Leeftijd: " + worldAgeDisplay,
-                "&7Actieve wereldtijd: " + worldAgeTime,
-                "&8Telt alleen wanneer minstens 1 speler online is"
+                "&8Minecraft-dagen tellen alleen bij online spelers"
         )));
         inv.setItem(31, item(Material.GOLD_INGOT, "&e&lTOP 10 SPELERS", List.of(
                 "&7Ranglijst op basis van Minecraft-speeltijd.",
@@ -171,7 +169,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         viewer.openInventory(inv);
     }
 
-    private long getOnlineWorldAgeTicks() {
+    private long getOnlineWorldAgeDays() {
         if (Bukkit.getScoreboardManager() == null) return -1L;
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
         Objective objective = scoreboard.getObjective("bc_world_age");
