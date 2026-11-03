@@ -7,6 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.GameRule;
 import org.bukkit.WorldBorder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -38,7 +41,8 @@ import java.util.Random;
 public final class BendemenMCCore extends JavaPlugin implements Listener {
     private static final long DEFAULT_COOLDOWN_SECONDS = 86400L;
     private static final long MINECRAFT_DAY_TICKS = 24000L;
-    private static final String DAYS_GUI_TITLE = "&8BendemenMC | Days Leaderboard";
+    private static final String PREFIX = "&f&lBendemenMC &r&8|";
+    private static final String DAYS_GUI_TITLE = PREFIX + " &6Days Leaderboard";
 
     private final Random random = new Random();
     private NamespacedKey actionKey;
@@ -56,6 +60,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         dataFile = new File(getDataFolder(), "data.yml");
         loadData();
         Bukkit.getPluginManager().registerEvents(this, this);
+        updateDaylightCycle();
 
         if (getCommand("dailyreward") == null || getCommand("days") == null) {
             getLogger().severe("Commands ontbreken in plugin.yml; plugin wordt uitgeschakeld.");
@@ -68,6 +73,24 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         saveData();
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        updateDaylightCycle();
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        // Run one tick later so Bukkit has updated the online-player collection.
+        Bukkit.getScheduler().runTask(this, this::updateDaylightCycle);
+    }
+
+    private void updateDaylightCycle() {
+        boolean hasOnlinePlayers = !Bukkit.getOnlinePlayers().isEmpty();
+        for (World world : Bukkit.getWorlds()) {
+            world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, hasOnlinePlayers);
+        }
     }
 
     private void loadData() {
@@ -93,7 +116,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(color("&cDit commando kan alleen door een speler worden gebruikt."));
+            sender.sendMessage(color(PREFIX + " &6Dit commando kan alleen door een speler worden gebruikt."));
             return true;
         }
         if (command.getName().equalsIgnoreCase("days")) {
@@ -135,10 +158,10 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
             SkullMeta skull = (SkullMeta) head.getItemMeta();
             if (skull != null) {
                 skull.setOwningPlayer(entry.player());
-                skull.setDisplayName(color("&e#" + (i + 1) + " &f" + playerName));
+                skull.setDisplayName(color("&6#" + (i + 1) + " &6" + playerName));
                 skull.setLore(List.of(
-                        color("&7Minecraft-speeldagen: &b" + formatMinecraftDays(entry.playTicks())),
-                        color("&7Speeltijd: &f" + formatTickDuration(entry.playTicks()))
+                        color("&6Minecraft-speeldagen: &6" + formatMinecraftDays(entry.playTicks())),
+                        color("&6Speeltijd: &6" + formatTickDuration(entry.playTicks()))
                 ));
                 head.setItemMeta(skull);
             }
@@ -146,25 +169,25 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         }
 
         long personalTicks = viewer.getStatistic(Statistic.PLAY_ONE_MINUTE);
-        inv.setItem(4, playerHead(viewer, "&b&lJOUW STATISTIEKEN", List.of(
-                "&7Minecraft-speeldagen: &b" + formatMinecraftDays(personalTicks),
-                "&7Totale speeltijd: &f" + formatTickDuration(personalTicks),
-                "&8Eén Minecraft-dag = 24.000 speelticks"
+        inv.setItem(4, playerHead(viewer, "&6&lJOUW STATISTIEKEN", List.of(
+                "&6Minecraft-speeldagen: &6" + formatMinecraftDays(personalTicks),
+                "&6Totale speeltijd: &6" + formatTickDuration(personalTicks),
+                "&6Eén Minecraft-dag = 24.000 speelticks"
         )));
 
         World overworld = Bukkit.getWorld(getConfig().getString("worlds.overworld", "world"));
         long worldAgeDays = getOnlineWorldAgeDays();
         String worldAgeDisplay = worldAgeDays < 0L
-                ? "&cDatapack niet geladen"
-                : "&e" + worldAgeDays + " Minecraft-dagen";
+                ? "&6Datapack niet geladen"
+                : "&6" + worldAgeDays + " Minecraft-dagen";
         inv.setItem(49, item(Material.CLOCK, "&6&lWORLD AGE", List.of(
-                "&7Wereld: &f" + (overworld == null ? "Niet gevonden" : overworld.getName()),
-                "&7Leeftijd: " + worldAgeDisplay,
-                "&8Minecraft-dagen tellen alleen bij online spelers"
+                "&6Wereld: &6" + (overworld == null ? "Niet gevonden" : overworld.getName()),
+                "&6Leeftijd: " + worldAgeDisplay,
+                "&6Minecraft-dagen tellen alleen bij online spelers"
         )));
-        inv.setItem(31, item(Material.GOLD_INGOT, "&e&lTOP 10 SPELERS", List.of(
-                "&7Ranglijst op basis van Minecraft-speeltijd.",
-                "&7Eén Minecraft-dag = 24.000 speelticks."
+        inv.setItem(31, item(Material.GOLD_INGOT, "&6&lTOP 10 SPELERS", List.of(
+                "&6Ranglijst op basis van Minecraft-speeltijd.",
+                "&6Eén Minecraft-dag = 24.000 speelticks."
         )));
         viewer.openInventory(inv);
     }
@@ -192,7 +215,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
     }
 
     private void openRewardGui(Player player) {
-        String title = color(getConfig().getString("gui.title", "&8BendemenMC | Daily Reward"));
+        String title = color(getConfig().getString("gui.title", PREFIX + " &6Daily Reward"));
         Inventory inv = Bukkit.createInventory(null, 27, title);
         ItemStack glass = item(Material.GRAY_STAINED_GLASS_PANE, " ", List.of());
         for (int slot = 0; slot < 27; slot++) inv.setItem(slot, glass);
@@ -200,13 +223,13 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         long remaining = remainingCooldownMillis();
         if (remaining <= 0L) {
             inv.setItem(13, taggedItem(Material.CHEST,
-                    getConfig().getString("gui.claim-name", "&a&lCLAIM DAILY REWARD"),
+                    getConfig().getString("gui.claim-name", "&6&lCLAIM DAILY REWARD"),
                     getConfig().getStringList("gui.claim-lore"), "claim"));
         } else {
             long seconds = (remaining + 999L) / 1000L;
             inv.setItem(13, item(Material.CLOCK,
-                    getConfig().getString("gui.cooldown-name", "&c&lREWARD OP COOLDOWN"),
-                    List.of("&7Volgende serverclaim over:", "&e" + formatDuration(seconds))));
+                    getConfig().getString("gui.cooldown-name", "&6&lREWARD OP COOLDOWN"),
+                    List.of("&6Volgende serverclaim over:", "&6" + formatDuration(seconds))));
         }
         player.openInventory(inv);
     }
@@ -219,7 +242,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
             event.setCancelled(true);
             return;
         }
-        if (!event.getView().getTitle().equals(color(getConfig().getString("gui.title", "&8BendemenMC | Daily Reward")))) {
+        if (!event.getView().getTitle().equals(color(getConfig().getString("gui.title", PREFIX + " &6Daily Reward")))) {
             return;
         }
 
@@ -234,7 +257,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
 
         long remaining = remainingCooldownMillis();
         if (remaining > 0L) {
-            player.sendMessage(color("&cDe server daily reward is nog niet beschikbaar. &7("
+            player.sendMessage(color(PREFIX + " &6De server daily reward is nog niet beschikbaar. &6("
                     + formatDuration((remaining + 999L) / 1000L) + ")"));
             player.closeInventory();
             return;
@@ -243,7 +266,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         List<Reward> configuredRewards = loadRewards();
         if (configuredRewards.isEmpty()) {
             player.closeInventory();
-            player.sendMessage(color("&cEr zijn geen geldige rewards ingesteld in config.yml."));
+            player.sendMessage(color(PREFIX + " &6Er zijn geen geldige rewards ingesteld in config.yml."));
             return;
         }
 
@@ -255,7 +278,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (event.getView().getTitle().equals(color(getConfig().getString("gui.title", "&8BendemenMC | Daily Reward")))
+        if (event.getView().getTitle().equals(color(getConfig().getString("gui.title", PREFIX + " &6Daily Reward")))
                 || event.getView().getTitle().equals(color(getConfig().getString("days-gui.title", DAYS_GUI_TITLE)))) {
             event.setCancelled(true);
         }
@@ -276,7 +299,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
                 }
                 if (ticks < 30) {
                     Reward preview = rewards.get(random.nextInt(rewards.size()));
-                    inv.setItem(13, item(preview.material(), "&b" + preview.name(), List.of("&7Randomizer...")));
+                    inv.setItem(13, item(preview.material(), "&6" + preview.name(), List.of("&6Randomizer...")));
                     player.updateInventory();
                     ticks++;
                     return;
@@ -286,19 +309,19 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
                 if (won == null) won = rewards.get(0);
                 applyExpansion(won.expansion());
                 inv.setItem(13, item(won.material(), won.name(), List.of(
-                        "&7Zeldzaamheid: &f" + rarityName(won.key()),
-                        "&7Expansion: &e+" + won.expansion() + " blok(ken)"
+                        "&6Zeldzaamheid: &6" + rarityName(won.key()),
+                        "&6Expansion: &6+" + won.expansion() + " blok(ken)"
                 )));
                 player.updateInventory();
-                player.sendMessage(color("&bBendemenMC &8| &fJe daily reward: " + won.name()
-                        + " &7(" + rarityName(won.key()) + ")"));
+                player.sendMessage(color(PREFIX + " &6Je daily reward: " + won.name()
+                        + " &6(" + rarityName(won.key()) + ")"));
 
                 if (won.expansion() > 0) {
-                    Bukkit.broadcastMessage(color("&bBendemenMC &8| &f" + player.getName()
-                            + " heeft " + won.name() + " gewonnen! &aOverworld en Nether zijn uitgebreid."));
+                    Bukkit.broadcastMessage(color(PREFIX + " &6" + player.getName()
+                            + " heeft " + won.name() + " gewonnen! &6Overworld en Nether zijn uitgebreid."));
                 } else {
-                    Bukkit.broadcastMessage(color("&bBendemenMC &8| &f" + player.getName()
-                            + " heeft de daily reward geopend, maar kreeg geen Expansion. &7(Common)"));
+                    Bukkit.broadcastMessage(color(PREFIX + " &6" + player.getName()
+                            + " heeft de daily reward geopend, maar kreeg geen Expansion. &6(Common)"));
                 }
 
                 rolling = false;

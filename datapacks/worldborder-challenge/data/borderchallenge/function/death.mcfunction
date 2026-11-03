@@ -9,4 +9,4 @@ execute if score #border_size bc_dummy matches 51.. in minecraft:the_nether run 
 execute in minecraft:the_end store result score #border_size bc_dummy run worldborder get
 execute if score #border_size bc_dummy matches 251.. in minecraft:the_end run worldborder add -1
 
-tellraw @a [{"text":"BendemenMC ","color":"white"},{"text":"| ","color":"dark_gray"},{"text":"Een speler is gestorven! Borders zijn kleiner geworden waar toegestaan. Minimum: Overworld/Nether 50, End 250.","color":"red"}]
+tellraw @a [{"text":"BendemenMC ","color":"white","bold":true},{"text":"| ","color":"dark_gray","bold":false},{"text":"Een speler is gestorven! Borders zijn kleiner geworden waar toegestaan. Minimum: Overworld/Nether 50, End 250.","color":"gold","bold":false}]
