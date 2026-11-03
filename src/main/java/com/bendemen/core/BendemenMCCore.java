@@ -38,7 +38,7 @@ import java.util.Random;
 public final class BendemenMCCore extends JavaPlugin implements Listener {
     private static final long DEFAULT_COOLDOWN_SECONDS = 86400L;
     private static final long MINECRAFT_DAY_TICKS = 24000L;
-    private static final String PREFIX = "&f&lBendemenMC &8|";
+    private static final String PREFIX = "&f&lBendemenMC &r&8|";
     private static final String DAYS_GUI_TITLE = PREFIX + " &6Days Leaderboard";
 
     private final Random random = new Random();
