@@ -1,16 +1,15 @@
-# Read the current position within the repeating Minecraft day (0-23999 ticks).
-execute store result score #current_day_repetition bc_daytime run time query minecraft:day repetition
+# World Age is synchronized to total Minecraft Game Time.
+# One Minecraft day equals 24,000 game ticks.
+execute store result score #current_game_time bc_daytime run time query gametime
+scoreboard players operation #current_game_day bc_daytime = #current_game_time bc_daytime
+scoreboard players operation #current_game_day bc_daytime /= #ticks_per_day bc_daytime
 
-# A new day starts when the repeating day timeline wraps back to a lower tick value.
-# Count one day only if at least one player is online.
-execute if entity @a if score #current_day_repetition bc_daytime < #last_day_repetition bc_daytime run scoreboard players add #world_age bc_world_age 1
+# Keep the displayed World Age exactly synchronized with Game Time.
+scoreboard players operation #world_age bc_world_age = #current_game_day bc_daytime
 
-# Grow all borders on that same online day transition.
-execute if entity @a if score #current_day_repetition bc_daytime < #last_day_repetition bc_daytime run function borderchallenge:grow
-
-# Always update the previous timeline position. With daylight cycle paused while empty,
-# this remains unchanged until players return and a new day actually begins.
-scoreboard players operation #last_day_repetition bc_daytime = #current_day_repetition bc_daytime
+# Grow all borders once when Game Time enters a new Minecraft day.
+execute if score #current_game_day bc_daytime > #last_game_day bc_daytime run function borderchallenge:grow
+scoreboard players operation #last_game_day bc_daytime = #current_game_day bc_daytime
 
 # Initialize a player's stored death count if they have no score yet.
 execute as @a unless score @s bc_deaths_old matches -2147483648..2147483647 run scoreboard players operation @s bc_deaths_old = @s bc_deaths
