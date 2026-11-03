@@ -23,6 +23,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
@@ -151,19 +153,30 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         )));
 
         World overworld = Bukkit.getWorld(getConfig().getString("worlds.overworld", "world"));
-        long worldAgeTicks = overworld == null ? 0L : overworld.getFullTime();
-        long worldAgeDays = Math.max(0L, worldAgeTicks / MINECRAFT_DAY_TICKS);
+        long worldAgeTicks = getOnlineWorldAgeTicks();
+        String worldAgeDisplay = worldAgeTicks < 0L
+                ? "&cDatapack niet geladen"
+                : "&e" + (worldAgeTicks / MINECRAFT_DAY_TICKS) + " Minecraft-dagen";
+        String worldAgeTime = worldAgeTicks < 0L ? "&7Onbekend" : "&f" + formatLongPlaytime(worldAgeTicks);
         inv.setItem(49, item(Material.CLOCK, "&6&lWORLD AGE", List.of(
                 "&7Wereld: &f" + (overworld == null ? "Niet gevonden" : overworld.getName()),
-                "&7Leeftijd: &e" + worldAgeDays + " dagen",
-                "&7Totale tijd: &f" + formatLongPlaytime(worldAgeTicks),
-                "&8Gebaseerd op de Overworld"
+                "&7Leeftijd: " + worldAgeDisplay,
+                "&7Actieve wereldtijd: " + worldAgeTime,
+                "&8Telt alleen wanneer minstens 1 speler online is"
         )));
         inv.setItem(31, item(Material.GOLD_INGOT, "&e&lTOP 10 SPELERS", List.of(
                 "&7Ranglijst op basis van Minecraft-speeltijd.",
                 "&7Eén Minecraft-dag = 24.000 speelticks."
         )));
         viewer.openInventory(inv);
+    }
+
+    private long getOnlineWorldAgeTicks() {
+        if (Bukkit.getScoreboardManager() == null) return -1L;
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Objective objective = scoreboard.getObjective("bc_world_age");
+        if (objective == null) return -1L;
+        return Math.max(0L, objective.getScore("#world_age").getScore());
     }
 
     private ItemStack playerHead(Player player, String name, List<String> lore) {
