@@ -38,7 +38,8 @@ import java.util.Random;
 public final class BendemenMCCore extends JavaPlugin implements Listener {
     private static final long DEFAULT_COOLDOWN_SECONDS = 86400L;
     private static final long MINECRAFT_DAY_TICKS = 24000L;
-    private static final String DAYS_GUI_TITLE = "&6BendemenMC | Days Leaderboard";
+    private static final String PREFIX = "&f&lBendemenMC &8|";
+    private static final String DAYS_GUI_TITLE = PREFIX + " &6Days Leaderboard";
 
     private final Random random = new Random();
     private NamespacedKey actionKey;
@@ -297,7 +298,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
                     Bukkit.broadcastMessage(color(PREFIX + " &6" + player.getName()
                             + " heeft " + won.name() + " gewonnen! &6Overworld en Nether zijn uitgebreid."));
                 } else {
-                    Bukkit.broadcastMessage(color("&6BendemenMC &6| &6" + player.getName()
+                    Bukkit.broadcastMessage(color(PREFIX + " &6" + player.getName()
                             + " heeft de daily reward geopend, maar kreeg geen Expansion. &6(Common)"));
                 }
 
