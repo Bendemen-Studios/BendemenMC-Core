@@ -7,8 +7,10 @@ scoreboard players operation #current_game_day bc_daytime /= #ticks_per_day bc_d
 # Keep the displayed World Age exactly synchronized with Game Time.
 scoreboard players operation #world_age bc_world_age = #current_game_day bc_daytime
 
-# Grow all borders once when Game Time enters a new Minecraft day.
-execute if score #current_game_day bc_daytime > #last_game_day bc_daytime run function borderchallenge:grow
+# Grow borders only if a new Game-Time day starts while at least one player is online.
+execute if entity @a if score #current_game_day bc_daytime > #last_game_day bc_daytime run function borderchallenge:grow
+
+# Always record the new day, even when nobody is online, so missed days do not cause catch-up growth.
 scoreboard players operation #last_game_day bc_daytime = #current_game_day bc_daytime
 
 # Initialize a player's stored death count if they have no score yet.
