@@ -1,0 +1,18 @@
+name: BendemenMCCore
+version: 1.0.0
+main: com.bendemen.core.BendemenMCCore
+api-version: '26.3'
+author: Bendemen Studios
+description: Core gameplay utilities for BendemenMC, including Daily Reward and Days leaderboard.
+commands:
+  dailyreward:
+    description: Open the server daily reward chest.
+    usage: /dailyreward
+    aliases: [daily, dailybonus]
+  days:
+    description: Open the Minecraft-days top 10 and world age.
+    usage: /days
+permissions:
+  bendemen.dailyreward.use:
+    description: Allows opening the daily reward GUI.
+    default: true
