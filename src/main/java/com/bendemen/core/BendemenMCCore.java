@@ -193,7 +193,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
     }
 
     private void openRewardGui(Player player) {
-        String title = color(getConfig().getString("gui.title", "&6BendemenMC | Daily Reward"));
+        String title = color(getConfig().getString("gui.title", PREFIX + " &6Daily Reward"));
         Inventory inv = Bukkit.createInventory(null, 27, title);
         ItemStack glass = item(Material.GRAY_STAINED_GLASS_PANE, " ", List.of());
         for (int slot = 0; slot < 27; slot++) inv.setItem(slot, glass);
@@ -220,7 +220,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
             event.setCancelled(true);
             return;
         }
-        if (!event.getView().getTitle().equals(color(getConfig().getString("gui.title", "&6BendemenMC | Daily Reward")))) {
+        if (!event.getView().getTitle().equals(color(getConfig().getString("gui.title", PREFIX + " &6Daily Reward")))) {
             return;
         }
 
@@ -256,7 +256,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (event.getView().getTitle().equals(color(getConfig().getString("gui.title", "&6BendemenMC | Daily Reward")))
+        if (event.getView().getTitle().equals(color(getConfig().getString("gui.title", PREFIX + " &6Daily Reward")))
                 || event.getView().getTitle().equals(color(getConfig().getString("days-gui.title", DAYS_GUI_TITLE)))) {
             event.setCancelled(true);
         }
