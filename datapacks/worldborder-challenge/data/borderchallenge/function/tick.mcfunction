@@ -1,16 +1,15 @@
-# Pause only the day/night cycle when the server is empty. Other server ticks keep running,
-# so loaded farms, redstone, hoppers, fluids, and entity processing can continue.
-
-# Detect day changes, including days skipped by sleeping.
+# Read the current position within the repeating Minecraft day (0-23999 ticks).
 execute store result score #current_day_repetition bc_daytime run time query minecraft:day repetition
 
-# Count Minecraft days only while at least one player is online.
-scoreboard players operation #day_delta bc_daytime = #current_day_repetition bc_daytime
-scoreboard players operation #day_delta bc_daytime -= #last_day_repetition bc_daytime
-execute if entity @a if score #day_delta bc_daytime matches 1.. run scoreboard players operation #world_age bc_world_age += #day_delta bc_daytime
+# A new day starts when the repeating day timeline wraps back to a lower tick value.
+# Count one day only if at least one player is online.
+execute if entity @a if score #current_day_repetition bc_daytime < #last_day_repetition bc_daytime run scoreboard players add #world_age bc_world_age 1
 
-# Grow borders once when a new day starts while a player is online.
-execute if score #current_day_repetition bc_daytime > #last_day_repetition bc_daytime if entity @a run function borderchallenge:grow
+# Grow all borders on that same online day transition.
+execute if entity @a if score #current_day_repetition bc_daytime < #last_day_repetition bc_daytime run function borderchallenge:grow
+
+# Always update the previous timeline position. With daylight cycle paused while empty,
+# this remains unchanged until players return and a new day actually begins.
 scoreboard players operation #last_day_repetition bc_daytime = #current_day_repetition bc_daytime
 
 # Initialize a player's stored death count if they have no score yet.
