@@ -7,6 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.GameRule;
 import org.bukkit.WorldBorder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -17,6 +18,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -57,6 +60,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         dataFile = new File(getDataFolder(), "data.yml");
         loadData();
         Bukkit.getPluginManager().registerEvents(this, this);
+        updateDaylightCycle();
 
         if (getCommand("dailyreward") == null || getCommand("days") == null) {
             getLogger().severe("Commands ontbreken in plugin.yml; plugin wordt uitgeschakeld.");
@@ -69,6 +73,24 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         saveData();
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        updateDaylightCycle();
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        // Run one tick later so Bukkit has updated the online-player collection.
+        Bukkit.getScheduler().runTask(this, this::updateDaylightCycle);
+    }
+
+    private void updateDaylightCycle() {
+        boolean hasOnlinePlayers = !Bukkit.getOnlinePlayers().isEmpty();
+        for (World world : Bukkit.getWorlds()) {
+            world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, hasOnlinePlayers);
+        }
     }
 
     private void loadData() {
