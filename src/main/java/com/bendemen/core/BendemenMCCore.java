@@ -7,7 +7,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
-import org.bukkit.GameRule;
 import org.bukkit.WorldBorder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,8 +17,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -60,7 +57,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         dataFile = new File(getDataFolder(), "data.yml");
         loadData();
         Bukkit.getPluginManager().registerEvents(this, this);
-        updateDaylightCycle();
+        enableDaylightCycle();
 
         if (getCommand("dailyreward") == null || getCommand("days") == null) {
             getLogger().severe("Commands ontbreken in plugin.yml; plugin wordt uitgeschakeld.");
@@ -75,21 +72,10 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         saveData();
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        updateDaylightCycle();
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent event) {
-        // Run one tick later so Bukkit has updated the online-player collection.
-        Bukkit.getScheduler().runTask(this, this::updateDaylightCycle);
-    }
-
-    private void updateDaylightCycle() {
-        boolean hasOnlinePlayers = !Bukkit.getOnlinePlayers().isEmpty();
+    private void enableDaylightCycle() {
+        // Ensure worlds previously frozen by older Core versions resume their normal day/night cycle.
         for (World world : Bukkit.getWorlds()) {
-            world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, hasOnlinePlayers);
+            world.setGameRule(org.bukkit.GameRule.DO_DAYLIGHT_CYCLE, true);
         }
     }
 
@@ -183,7 +169,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         inv.setItem(49, item(Material.CLOCK, "&6&lWORLD AGE", List.of(
                 "&6Wereld: &6" + (overworld == null ? "Niet gevonden" : overworld.getName()),
                 "&6Leeftijd: " + worldAgeDisplay,
-                "&6Minecraft-dagen tellen alleen bij online spelers"
+                "&6World Age volgt Game Time (24.000 ticks = 1 dag)"
         )));
         inv.setItem(31, item(Material.GOLD_INGOT, "&6&lTOP 10 SPELERS", List.of(
                 "&6Ranglijst op basis van Minecraft-speeltijd.",
