@@ -11,34 +11,34 @@ worlds:
 # Expansion is added to the WorldBorder diameter in each configured world.
 rewards:
   common:
-    display-name: '&fGeen Expansion'
+    display-name: '&6Geen Expansion'
     weight: 70
     expansion: 0
     material: 'COAL'
   rare:
-    display-name: '&a+1 Block Expansion'
+    display-name: '&6+1 Block Expansion'
     weight: 20
     expansion: 1
     material: 'EMERALD'
   epic:
-    display-name: '&9+2 Block Expansion'
+    display-name: '&6+2 Block Expansion'
     weight: 8
     expansion: 2
     material: 'DIAMOND'
   mythic:
-    display-name: '&5+3 Block Expansion'
+    display-name: '&6+3 Block Expansion'
     weight: 2
     expansion: 3
     material: 'NETHER_STAR'
 
 gui:
-  title: '&8BendemenMC | Daily Reward'
-  claim-name: '&a&lCLAIM DAILY REWARD'
+  title: '&6BendemenMC | Daily Reward'
+  claim-name: '&6&lCLAIM DAILY REWARD'
   claim-lore:
-    - '&7Klik om de dagelijkse reward te openen.'
-    - '&eEén reward per 24 uur voor de hele server.'
-  cooldown-name: '&c&lREWARD OP COOLDOWN'
-  rolling-name: '&b&lDe randomizer draait...'
+    - '&6Klik om de dagelijkse reward te openen.'
+    - '&6Eén reward per 24 uur voor de hele server.'
+  cooldown-name: '&6&lREWARD OP COOLDOWN'
+  rolling-name: '&6&lDe randomizer draait...'
 
 days-gui:
-  title: '&8BendemenMC | Days Leaderboard'
+  title: '&6BendemenMC | Days Leaderboard'
