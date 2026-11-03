@@ -11,25 +11,25 @@ worlds:
 # Expansion is added to the WorldBorder diameter in each configured world.
 rewards:
   common:
-    display-name: '&6Geen Expansion'
+    display-name: '&cGeen Expansion'
     weight: 70
     expansion: 0
-    material: 'COAL'
+    material: 'GRAY_STAINED_GLASS_PANE'
   rare:
-    display-name: '&6+1 Block Expansion'
+    display-name: '&a+1 Block Expansion'
     weight: 20
     expansion: 1
-    material: 'EMERALD'
+    material: 'LIME_STAINED_GLASS_PANE'
   epic:
-    display-name: '&6+2 Block Expansion'
+    display-name: '&5+2 Block Expansion'
     weight: 8
     expansion: 2
-    material: 'DIAMOND'
+    material: 'PURPLE_STAINED_GLASS_PANE'
   mythic:
     display-name: '&6+3 Block Expansion'
     weight: 2
     expansion: 3
-    material: 'NETHER_STAR'
+    material: 'YELLOW_STAINED_GLASS_PANE'
 
 gui:
   title: '&f&lBendemenMC &8| &6Daily Reward'
