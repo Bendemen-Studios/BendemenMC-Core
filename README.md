@@ -52,3 +52,5 @@ Configuration is stored in `plugins/BendemenMCCore/config.yml`; global cooldown 
 ## Continuous build
 
 GitHub Actions builds the plugin on pushes to `feature/core-plugin` using Java 25. The compiled JAR is published as the `BendemenMC-Core` workflow artifact.
+
+Build target: Paper API 26.3 uses the `26.3.build.+` coordinate scheme.
