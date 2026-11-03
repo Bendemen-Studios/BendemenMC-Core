@@ -1,3 +1,8 @@
+# Pause only the day/night cycle when the server is empty. Other server ticks keep running,
+# so loaded farms, redstone, hoppers, fluids, and entity processing can continue.
+execute if entity @a run gamerule doDaylightCycle true
+execute unless entity @a run gamerule doDaylightCycle false
+
 # Detect day changes, including days skipped by sleeping.
 execute store result score #current_day_repetition bc_daytime run time query minecraft:day repetition
 
