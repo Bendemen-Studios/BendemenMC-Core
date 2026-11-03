@@ -46,6 +46,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
     private File dataFile;
     private YamlConfiguration data;
     private boolean rolling = false;
+    private WorldAgeTracker worldAgeTracker;
 
     private record Reward(String key, String name, int weight, int expansion, Material material) {}
     private record PlayerDays(OfflinePlayer player, long playTicks) {}
@@ -58,6 +59,8 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         loadData();
         Bukkit.getPluginManager().registerEvents(this, this);
         enableDaylightCycle();
+        worldAgeTracker = new WorldAgeTracker(this);
+        worldAgeTracker.start();
 
         if (getCommand("dailyreward") == null || getCommand("days") == null) {
             getLogger().severe("Commands ontbreken in plugin.yml; plugin wordt uitgeschakeld.");
@@ -69,6 +72,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        if (worldAgeTracker != null) worldAgeTracker.stop();
         saveData();
     }
 
@@ -169,7 +173,7 @@ public final class BendemenMCCore extends JavaPlugin implements Listener {
         inv.setItem(49, item(Material.CLOCK, "&6&lWORLD AGE", List.of(
                 "&6Wereld: &6" + (overworld == null ? "Niet gevonden" : overworld.getName()),
                 "&6Leeftijd: " + worldAgeDisplay,
-                "&6World Age volgt Game Time (24.000 ticks = 1 dag)"
+                "&6Eigen World Age: dagcyclus + Game Time; slapen telt als dagovergang"
         )));
         inv.setItem(31, item(Material.GOLD_INGOT, "&6&lTOP 10 SPELERS", List.of(
                 "&6Ranglijst op basis van Minecraft-speeltijd.",
